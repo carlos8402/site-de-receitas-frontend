@@ -3,9 +3,9 @@ import { useState } from "react";
 import { Form, redirect, useActionData } from "react-router-dom";
 
 // Tipos para os dados da receita
-type Ingrediente = {
-  nome: string;
-  quantidade: string;
+type Ingredient = {
+  name: string;
+  quant: string;
 };
 
 type NewRecipeActionData = {
@@ -16,29 +16,29 @@ type NewRecipeActionData = {
 export const newRecipeAction = async ({ request }: { request: Request }) => {
   const formData = await request.formData();
 
-  const titulo = formData.get("titulo") as string;
-  const descricao = formData.get("descricao") as string;
-  const tipo = formData.get("tipo") as string;
-  const foto = formData.get("foto") as string;
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const type = formData.get("type") as string;
+  const photo = formData.get("photo") as string;
 
   // Converter ingredientes e modo de preparo
-  const ingredientesString = formData.get("ingredientes") as string;
-  const ingredientes: Ingrediente[] = ingredientesString
-    ? JSON.parse(ingredientesString)
+  const ingredientsString = formData.get("ingredients") as string;
+  const ingredients: Ingredient[] = ingredientsString
+    ? JSON.parse(ingredientsString)
     : [];
 
-  const modoPreparoString = formData.get("modo_preparo") as string;
-  const modoPreparo: string[] = modoPreparoString
-    ? modoPreparoString.split("\n")
+  const preparationString = formData.get("preparation") as string;
+  const preparation: string[] = preparationString
+    ? preparationString.split("\n")
     : [];
 
   if (
-    !titulo ||
-    !descricao ||
-    !tipo ||
-    !foto ||
-    ingredientes.length === 0 ||
-    modoPreparo.length === 0
+    !title ||
+    !description ||
+    !type ||
+    !photo ||
+    ingredients.length === 0 ||
+    preparation.length === 0
   ) {
     return {
       error:
@@ -48,12 +48,12 @@ export const newRecipeAction = async ({ request }: { request: Request }) => {
 
   try {
     const response = await axios.post("http://localhost:3000/recipes", {
-      titulo,
-      descricao,
-      tipo,
-      foto,
-      ingredientes,
-      modo_preparo: modoPreparo,
+      title,
+      description,
+      type,
+      photo,
+      ingredients,
+      preparation: preparation,
     });
 
     if (response.status === 201) {
@@ -70,51 +70,51 @@ export const newRecipeAction = async ({ request }: { request: Request }) => {
 // Componente para criar nova receita
 export function NewRecipe() {
   const actionData = useActionData<NewRecipeActionData>();
-  const [ingredientes, setIngredientes] = useState<Ingrediente[]>([
-    { nome: "", quantidade: "" },
+  const [ingredients, setIngredients] = useState<Ingredient[]>([
+    { name: "", quant: "" },
   ]);
-  const [modoPreparo, setModoPreparo] = useState<string[]>([""]);
+  const [preparation, setPreparation] = useState<string[]>([""]);
 
   // Adicionar um novo ingrediente
-  const adicionarIngrediente = () => {
-    setIngredientes([...ingredientes, { nome: "", quantidade: "" }]);
+  const addIngredient = () => {
+    setIngredients([...ingredients, { name: "", quant: "" }]);
   };
 
   // Remover um ingrediente
-  const removerIngrediente = (index: number) => {
-    const newIngredientes = ingredientes.filter((_, i) => i !== index);
-    setIngredientes(newIngredientes);
+  const removeIngredient = (index: number) => {
+    const newIngredients = ingredients.filter((_, i) => i !== index);
+    setIngredients(newIngredients);
   };
 
   // Atualizar um ingrediente
-  const atualizarIngrediente = (
+  const updateIngredient = (
     index: number,
-    field: keyof Ingrediente,
+    field: keyof Ingredient,
     value: string
   ) => {
-    const newIngredientes = ingredientes.map((ing, i) =>
+    const newIngredients = ingredients.map((ing, i) =>
       i === index ? { ...ing, [field]: value } : ing
     );
-    setIngredientes(newIngredientes);
+    setIngredients(newIngredients);
   };
 
   // Adicionar um novo passo no modo de preparo
-  const adicionarModoPreparo = () => {
-    setModoPreparo([...modoPreparo, ""]);
+  const addPreparation = () => {
+    setPreparation([...preparation, ""]);
   };
 
   // Remover um passo do modo de preparo
-  const removerModoPreparo = (index: number) => {
-    const newModoPreparo = modoPreparo.filter((_, i) => i !== index);
-    setModoPreparo(newModoPreparo);
+  const removePreparation = (index: number) => {
+    const newPreparation = preparation.filter((_, i) => i !== index);
+    setPreparation(newPreparation);
   };
 
   // Atualizar o valor de um passo no modo de preparo
-  const atualizarModoPreparo = (index: number, value: string) => {
-    const newModoPreparo = modoPreparo.map((passo, i) =>
+  const updatePreparation = (index: number, value: string) => {
+    const newPreparation = preparation.map((passo, i) =>
       i === index ? value : passo
     );
-    setModoPreparo(newModoPreparo);
+    setPreparation(newPreparation);
   };
 
   return (
@@ -131,25 +131,25 @@ export function NewRecipe() {
         <Form method="POST" className="flex flex-col items-center gap-4">
           <input
             type="text"
-            name="titulo"
+            name="title"
             placeholder="Título da receita"
             className="p-2"
           />
           <input
             type="text"
-            name="descricao"
+            name="description"
             placeholder="Descrição da receita"
             className="p-2"
           />
           <input
             type="text"
-            name="tipo"
+            name="type"
             placeholder="Tipo de receita (ex: Sobremesa)"
             className="p-2"
           />
           <input
             type="text"
-            name="foto"
+            name="photo"
             placeholder="URL da foto"
             className="p-2"
           />
@@ -157,29 +157,29 @@ export function NewRecipe() {
           {/* Ingredientes */}
           <div className="w-full">
             <label className="text-white">Ingredientes:</label>
-            {ingredientes.map((ingrediente, index) => (
+            {ingredients.map((ingredient, index) => (
               <div key={index} className="flex flex-col gap-2">
                 <input
                   type="text"
-                  value={ingrediente.nome}
+                  value={ingredient.name}
                   onChange={(e) =>
-                    atualizarIngrediente(index, "nome", e.target.value)
+                    updateIngredient(index, "name", e.target.value)
                   }
                   placeholder={`Ingrediente ${index + 1}`}
                   className="p-2"
                 />
                 <input
                   type="text"
-                  value={ingrediente.quantidade}
+                  value={ingredient.quant}
                   onChange={(e) =>
-                    atualizarIngrediente(index, "quantidade", e.target.value)
+                    updateIngredient(index, "quant", e.target.value)
                   }
                   placeholder="Quantidade"
                   className="p-2"
                 />
                 <button
                   type="button"
-                  onClick={() => removerIngrediente(index)}
+                  onClick={() => removeIngredient(index)}
                   className="bg-red-500 text-white px-2"
                 >
                   Remover
@@ -188,7 +188,7 @@ export function NewRecipe() {
             ))}
             <button
               type="button"
-              onClick={adicionarIngrediente}
+              onClick={addIngredient}
               className="bg-violet-600 text-white px-4 mt-2"
             >
               Adicionar Ingrediente
@@ -197,25 +197,25 @@ export function NewRecipe() {
             {/* Campo oculto para enviar ingredientes como string JSON */}
             <input
               type="hidden"
-              name="ingredientes"
-              value={JSON.stringify(ingredientes)}
+              name="ingredients"
+              value={JSON.stringify(ingredients)}
             />
           </div>
 
           {/* Modo de Preparo */}
           <div className="w-full">
             <label className="text-white">Modo de Preparo:</label>
-            {modoPreparo.map((passo, index) => (
+            {preparation.map((passo, index) => (
               <div key={index} className="flex flex-col gap-2">
                 <textarea
                   value={passo}
-                  onChange={(e) => atualizarModoPreparo(index, e.target.value)}
+                  onChange={(e) => updatePreparation(index, e.target.value)}
                   placeholder={`Passo ${index + 1}`}
                   className="p-2"
                 />
                 <button
                   type="button"
-                  onClick={() => removerModoPreparo(index)}
+                  onClick={() => removePreparation(index)}
                   className="bg-red-500 text-white px-2"
                 >
                   Remover
@@ -224,7 +224,7 @@ export function NewRecipe() {
             ))}
             <button
               type="button"
-              onClick={adicionarModoPreparo}
+              onClick={addPreparation}
               className="bg-violet-600 text-white px-4 mt-2"
             >
               Adicionar Passo
@@ -233,8 +233,8 @@ export function NewRecipe() {
             {/* Campo escondido para enviar o modo de preparo como string */}
             <input
               type="hidden"
-              name="modo_preparo"
-              value={modoPreparo.join("\n")}
+              name="preparation"
+              value={preparation.join("\n")}
             />
           </div>
 

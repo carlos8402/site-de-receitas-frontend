@@ -3,11 +3,11 @@ import { Link, useLoaderData } from "react-router-dom";
 
 export type Recipe = {
   id: number;
-  titulo: string;
-  descricao: string;
-  modo_preparo: string[];
-  tipo: string;
-  foto: string;
+  title: string;
+  description: string;
+  preparation: string[];
+  type: string;
+  photo: string;
 };
 
 export async function recipesLoader() {
@@ -26,15 +26,15 @@ export function AllRecipes() {
             <Link className="" to={`/recipe/${recipe.id}`}>
               <img
                 className="w-full h-52 object-cover"
-                src={recipe.foto}
-                alt={recipe.titulo}
+                src={recipe.photo}
+                alt={recipe.title}
               />
               <div>
                 <p className="text-xl text-violet-700 font-bold my-2">
-                  {recipe.titulo}
+                  {recipe.title}
                 </p>
                 <p className="text-lg text-violet-600 mb-6">
-                  {recipe.descricao}
+                  {recipe.description}
                 </p>
               </div>
             </Link>
