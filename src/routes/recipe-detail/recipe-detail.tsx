@@ -13,7 +13,9 @@ export type Recipe = {
 
 export async function recipeDetailLoader({ params }: LoaderFunctionArgs) {
   const { id } = params;
-  const response = await axios.get(`http://localhost:3000/recipes/${id}`);
+  const response = await axios.get(
+    `https://site-de-receitas-backend.onrender.com/recipes/${id}`
+  );
   return response.data as Recipe;
 }
 

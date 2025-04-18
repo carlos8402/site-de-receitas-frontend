@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 export function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className=" flex justify-between items-center border-t  border-b border-violet-300 bg-violet-200 mt-4  py-2 px-8">
+    <div className="flex justify-between items-center border-t  border-b border-violet-300 bg-violet-200 mt-4  py-2 px-8">
       <Logo />
       <div>
         <button
