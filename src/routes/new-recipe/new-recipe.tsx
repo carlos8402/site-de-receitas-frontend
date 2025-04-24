@@ -1,6 +1,11 @@
 import axios from "axios";
 import { useState } from "react";
-import { Form, redirect, useActionData } from "react-router-dom";
+import {
+  Form,
+  redirect,
+  useActionData,
+  ActionFunctionArgs,
+} from "react-router-dom";
 
 // Tipos para os dados da receita
 type Ingredient = {
@@ -13,7 +18,9 @@ type NewRecipeActionData = {
 };
 
 // Função de ação para enviar a receita para a API
-export const newRecipeAction = async ({ request }: { request: Request }) => {
+export const newRecipeAction = async ({
+  request,
+}: ActionFunctionArgs): Promise<NewRecipeActionData | Response> => {
   const formData = await request.formData();
 
   const title = formData.get("title") as string;
@@ -21,7 +28,6 @@ export const newRecipeAction = async ({ request }: { request: Request }) => {
   const type = formData.get("type") as string;
   const photo = formData.get("photo") as string;
 
-  // Converter ingredientes e modo de preparo
   const ingredientsString = formData.get("ingredients") as string;
   const ingredients: Ingredient[] = ingredientsString
     ? JSON.parse(ingredientsString)
@@ -53,7 +59,7 @@ export const newRecipeAction = async ({ request }: { request: Request }) => {
       type,
       photo,
       ingredients,
-      preparation: preparation,
+      preparation,
     });
 
     if (response.status === 201) {
@@ -69,24 +75,21 @@ export const newRecipeAction = async ({ request }: { request: Request }) => {
 
 // Componente para criar nova receita
 export function NewRecipe() {
-  const actionData = useActionData<NewRecipeActionData>();
+  const actionData = useActionData() as NewRecipeActionData;
   const [ingredients, setIngredients] = useState<Ingredient[]>([
     { name: "", quant: "" },
   ]);
   const [preparation, setPreparation] = useState<string[]>([""]);
 
-  // Adicionar um novo ingrediente
   const addIngredient = () => {
     setIngredients([...ingredients, { name: "", quant: "" }]);
   };
 
-  // Remover um ingrediente
   const removeIngredient = (index: number) => {
     const newIngredients = ingredients.filter((_, i) => i !== index);
     setIngredients(newIngredients);
   };
 
-  // Atualizar um ingrediente
   const updateIngredient = (
     index: number,
     field: keyof Ingredient,
@@ -98,18 +101,15 @@ export function NewRecipe() {
     setIngredients(newIngredients);
   };
 
-  // Adicionar um novo passo no modo de preparo
   const addPreparation = () => {
     setPreparation([...preparation, ""]);
   };
 
-  // Remover um passo do modo de preparo
   const removePreparation = (index: number) => {
     const newPreparation = preparation.filter((_, i) => i !== index);
     setPreparation(newPreparation);
   };
 
-  // Atualizar o valor de um passo no modo de preparo
   const updatePreparation = (index: number, value: string) => {
     const newPreparation = preparation.map((passo, i) =>
       i === index ? value : passo
